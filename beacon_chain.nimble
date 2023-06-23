@@ -48,7 +48,7 @@ requires(
   "zxcvbn"
 )
 
-requires "https://gitlab.com/status-im/nimbus-security-resources.git"
+requires "nimbus-security-resources"
 
 import tables
 let namedBin = {

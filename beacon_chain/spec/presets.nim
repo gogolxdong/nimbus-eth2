@@ -399,7 +399,17 @@ elif const_preset == "minimal":
     # Configured on a per testnet basis
     DEPOSIT_CONTRACT_ADDRESS: default(Eth1Address)
   )
+elif const_preset == "bsc":
+  import ./presets/bsc
+  export bsc
+  const SECONDS_PER_SLOT* {.intdefine.}: uint64 = 12
 
+  const defaultRuntimeConfig* = RuntimeConfig(
+    PRESET_BASE: "bsc",
+    CONFIG_NAME: "bsc",
+    DEPOSIT_CHAIN_ID: 56,
+    DEPOSIT_NETWORK_ID: 56,
+  )
 else:
   {.error: "Only mainnet and minimal presets supported".}
   # macro createConstantsFromPreset*(path: static string): untyped =

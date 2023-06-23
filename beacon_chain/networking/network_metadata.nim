@@ -45,6 +45,7 @@ type
     rinkeby
     goerli
     sepolia
+    bsc
 
   Eth2NetworkMetadata* = object
     case incompatible*: bool
@@ -201,6 +202,7 @@ proc loadCompileTimeNetworkMetadata(
     path: string,
     eth1Network = none(Eth1Network),
     loadGenesis = true): Eth2NetworkMetadata {.raises: [].} =
+  echo path
   if fileExists(path & "/config.yaml"):
     try:
       result = loadEth2NetworkMetadata(path, eth1Network, loadGenesis)
@@ -234,6 +236,19 @@ when const_preset == "gnosis":
     checkForkConsistency(gnosisMetadata.cfg)
     doAssert gnosisMetadata.cfg.DENEB_FORK_EPOCH == FAR_FUTURE_EPOCH
 
+elif const_preset == "bsc":
+  import stew/assign2
+  when incbinEnabled:
+    let
+      bscGenesis {.importc: "eth2_bsc_genesis".}: ptr UncheckedArray[byte]
+      bscGenesisSize {.importc: "eth2_bsc_genesis_size".}: int
+    {.passc: "-I" & vendorDir.}
+    {.compile: "network_metadata_bsc.S".}
+  const bscMetadata = loadCompileTimeNetworkMetadata(vendorDir & "/eth2-networks/shared/bsc", some bsc, not incbinEnabled)
+  static:
+    checkForkConsistency(bscMetadata.cfg)
+    doAssert bscMetadata.cfg.DENEB_FORK_EPOCH == FAR_FUTURE_EPOCH
+
 elif const_preset == "mainnet":
   import stew/assign2
 
@@ -250,6 +265,8 @@ elif const_preset == "mainnet":
       sepoliaGenesis {.importc: "eth2_sepolia_genesis".}: ptr UncheckedArray[byte]
       sepoliaGenesisSize {.importc: "eth2_sepolia_genesis_size".}: int
 
+     
+
     # let `.incbin` in assembly file find the binary file through search path
     {.passc: "-I" & vendorDir.}
     {.compile: "network_metadata_mainnet.S".}
@@ -264,7 +281,7 @@ elif const_preset == "mainnet":
       vendorDir & "/eth2-networks/shared/prater", some goerli, not incbinEnabled)
     sepoliaMetadata = loadCompileTimeNetworkMetadata(
       vendorDir & "/sepolia/bepolia", some sepolia, not incbinEnabled)
-
+ 
   static:
     for network in [mainnetMetadata, praterMetadata, sepoliaMetadata]:
       checkForkConsistency(network.cfg)
@@ -325,7 +342,8 @@ proc getMetadataForNetwork*(
         withGenesis(sepoliaMetadata, sepoliaGenesis)
       else:
         loadRuntimeMetadata()
-
+    elif const_preset == "bsc":
+      withGenesis(bscMetadata, bscGenesis)
     else:
       loadRuntimeMetadata()
 
@@ -354,6 +372,8 @@ proc getRuntimeConfig*(
         mainnetMetadata
       elif const_preset == "gnosis":
         gnosisMetadata
+      elif const_preset == "bsc":
+        bscMetadata
       else:
         # This is a non-standard build (i.e. minimal), and the function was
         # most likely executed in a test. The best we can do is return a fully

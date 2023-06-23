@@ -1304,6 +1304,8 @@ proc loadEth2Network*(
       "gnosis"
     elif const_preset == "mainnet":
       "mainnet"
+    elif const_preset == "bsc":
+      "bsc"
     else:
       "(unspecified)"
   network_name.set(2, labelValues = [eth2Network.get(otherwise = defaultName)])
@@ -1315,6 +1317,8 @@ proc loadEth2Network*(
       getMetadataForNetwork("gnosis")
     elif const_preset == "mainnet":
       getMetadataForNetwork("mainnet")
+    elif const_preset == "bsc":
+      getMetadataForNetwork("bsc")
     else:
       # Presumably other configurations can have other defaults, but for now
       # this simplifies the flow
