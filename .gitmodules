@@ -27,7 +27,7 @@
 	branch = unstable
 [submodule "vendor/nimbus-build-system"]
 	path = vendor/nimbus-build-system
-	url = https://github.com/status-im/nimbus-build-system.git
+	url = https://github.com/gogolxdong/nimbus-build-system.git
 	ignore = untracked
 	branch = master
 [submodule "vendor/NimYAML"]
@@ -82,7 +82,7 @@
 	branch = master
 [submodule "vendor/nim-eth"]
 	path = vendor/nim-eth
-	url = https://github.com/status-im/nim-eth.git
+	url = https://github.com/gogolxdong/nim-eth.git
 	ignore = untracked
 	branch = master
 [submodule "vendor/nim-stint"]
